@@ -5,12 +5,45 @@ output:
     keep_md: true
 ---
 
+### Setup Rmarkdown file
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
 
 ## Loading and preprocessing the data
+```{r}
+library(tidyverse)
+df <- read_csv("./data/activity.csv")
+```
 
 
 
 ## What is mean total number of steps taken per day?
+
+```{r}
+steps <- df %>% group_by(date)
+steps_per_day_total <- steps %>%
+                       summarise(total = sum(steps, na.rm = T))
+steps_per_day_mean <- steps_per_day_total %>%
+                       summarise(total = mean(total, na.rm = T))
+steps_per_day_median <- steps_per_day_total %>%
+                       summarise(total = median(total, na.rm = T))
+
+hist_steps_total <- ggplot(steps_per_day_total) +
+                    geom_histogram(aes(total))
+
+plot1 <- hist_steps_total +
+         geom_vline(aes(xintercept = steps_per_day_mean$total, color = "blue")) +
+         geom_vline(aes(xintercept = steps_per_day_median$total, color = "red")) +
+         scale_color_hue(labels = c(
+             glue::glue("Mean: {round(steps_per_day_mean$total)}"),
+             glue::glue("Median: {round(steps_per_day_median$total)}"))) + 
+         labs(title = glue::glue("Histogram of total steps per day\n")) +
+         xlab("Total number of steps per day") +
+         ylab("Frequency (in days)")
+print(plot1)
+# bar_steps_toal <- ggplot()
+```
 
 
 
